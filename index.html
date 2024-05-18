@@ -1,0 +1,80 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alchemy Elements</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>Alchemy Elements</h1>
+  <div id="elementList">
+    <h2>Element List</h2>
+    <ul id="elements"></ul>
+  </div>
+  <div id="form">
+    <h2>Add Element</h2>
+    <label for="elementInput">Enter Element (e.g., water + earth = plant):</label>
+    <input type="text" id="elementInput">
+    <button onclick="addElement()">Add</button>
+  </div>
+  <div id="jsonUpload">
+    <h2>Upload JSON File</h2>
+    <input type="file" id="fileInput" accept=".json">
+    <button onclick="parseJSON()">Upload</button>
+  </div>
+  <script>
+    // Function to add element to the list
+    function addElement() {
+      const elementInput = document.getElementById('elementInput').value;
+      const elementsList = document.getElementById('elements');
+      const listItem = document.createElement('li');
+      listItem.textContent = elementInput;
+      elementsList.appendChild(listItem);
+      saveElements();
+    }
+
+    // Function to parse and add elements from JSON file
+    function parseJSON() {
+      const fileInput = document.getElementById('fileInput');
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const jsonContent = event.target.result;
+        const elementsData = JSON.parse(jsonContent)['elements'];
+        for (const key in elementsData) {
+          const element = elementsData[key];
+          const elementString = element[0] + ' + ' + element[1] + ' = ' + element[2];
+          const elementsList = document.getElementById('elements');
+          const listItem = document.createElement('li');
+          listItem.textContent = elementString;
+          elementsList.appendChild(listItem);
+        }
+        saveElements();
+      };
+      reader.readAsText(file);
+    }
+
+    // Function to save elements to local storage
+    function saveElements() {
+      const elementsList = document.getElementById('elements');
+      const elements = [];
+      elementsList.querySelectorAll('li').forEach(item => elements.push(item.textContent));
+      localStorage.setItem('elements', JSON.stringify(elements));
+    }
+
+    // Function to load elements from local storage
+    function loadElements() {
+      const elements = JSON.parse(localStorage.getItem('elements'));
+      const elementsList = document.getElementById('elements');
+      elements.forEach(element => {
+        const listItem = document.createElement('li');
+        listItem.textContent = element;
+        elementsList.appendChild(listItem);
+      });
+    }
+
+    // Load elements when the page is loaded
+    window.onload = loadElements;
+  </script>
+</body>
+</html>
