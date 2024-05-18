@@ -172,12 +172,35 @@ button {
     }
 
     // Function to show element information
-    function showElementInfo(element) {
-      const elementInfo = document.getElementById('elementInfo');
-      const elementCreation = document.getElementById('elementCreation');
-      elementCreation.textContent = `To create ${element}, you need...`; // You can add the logic to display creation here
-      elementInfo.style.display = 'block';
-    }
+function showElementInfo(element) {
+  const elementInfo = document.getElementById('elementInfo');
+  const elementCreation = document.getElementById('elementCreation');
+  const combinations = getCombinations(element);
+  let combinationText = '';
+  combinations.forEach((combination, index) => {
+    combinationText += `${index + 1}. ${combination}\n`;
+  });
+  elementCreation.textContent = combinationText;
+  elementInfo.style.display = 'block';
+}
+
+// Function to get combinations required for creating the selected element
+function getCombinations(element) {
+  const combinations = [];
+  // Add your logic to generate combinations based on the provided element
+  // For demonstration purposes, let's assume some combinations
+  switch (element) {
+    case 'Swamp':
+      combinations.push("Earth + Water = Plant");
+      combinations.push("Plant + Plant = Tree");
+      combinations.push("Water + Fire = Stone");
+      combinations.push("Stone + Water = Mud");
+      combinations.push("Mud + Tree = Swamp (final step)");
+      break;
+    // Add cases for other elements if needed
+  }
+  return combinations;
+}
 
     // Load elements when the page is loaded
     window.onload = loadElements;
