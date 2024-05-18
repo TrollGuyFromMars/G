@@ -3,188 +3,73 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Alchemy Elements</title>
+  <title>Element Combinations</title>
   <style>
-    body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 20px;
-}
+    .element {
+      cursor: pointer;
+      margin: 5px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      display: inline-block;
+    }
 
-h1, h2 {
-  text-align: center;
-}
+    #combinations {
+      margin-top: 20px;
+    }
 
-#search {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-#elementList, #form, #jsonUpload, #elementInfo {
-  margin-bottom: 20px;
-}
-
-label {
-  display: block;
-}
-
-button {
-  margin-top: 10px;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  margin-bottom: 5px;
-  position: relative;
-}
-
-button {
-  position: absolute;
-  right: 0;
-}
-
-#elementInfo {
-  text-align: center;
-}
-
+    #combinations p {
+      margin: 5px 0;
+    }
   </style>
 </head>
 <body>
-  <h1>Alchemy Elements</h1>
-  <div id="search">
-    <input type="text" id="searchInput" oninput="filterElements()" placeholder="Search elements...">
-  </div>
-  <div id="elementList">
-    <h2>Element List</h2>
-    <ul id="elements"></ul>
-  </div>
-  <div id="form">
-    <h2>Add Element</h2>
-    <label for="elementInput">Enter Element (e.g., water + earth = plant):</label>
-    <input type="text" id="elementInput">
-    <button onclick="addElement()">Add</button>
-  </div>
-  <div id="jsonUpload">
-    <h2>Upload JSON File</h2>
-    <input type="file" id="fileInput" accept=".json">
-    <button onclick="parseJSON()">Upload</button>
-  </div>
-  <div id="elementInfo" style="display: none;">
-    <h2>Element Info</h2>
-    <p id="elementCreation"></p>
-  </div>
+  <h1>Element Combinations</h1>
+
+  <input type="text" id="searchInput" placeholder="Search for an element...">
+  <div id="elements"></div>
+  <div id="combinations"></div>
+
   <script>
-    // Function to add element to the list
-    function addElement() {
-      const elementInput = document.getElementById('elementInput').value;
-      const elementsList = document.getElementById('elements');
-      const listItem = document.createElement('li');
-      listItem.textContent = elementInput;
-      listItem.onclick = function() {
-        showElementInfo(elementInput);
-      };
-      elementsList.appendChild(listItem);
-      saveElements();
-    }
+    // Load elements from JSON file
+fetch('elements.json')
+  .then(response => response.json())
+  .then(elements => {
+    const elementsDiv = document.getElementById('elements');
+    elements.forEach(element => {
+      const div = document.createElement('div');
+      div.className = 'element';
+      div.textContent = element.name;
+      div.onclick = () => showCombinations(element);
+      elementsDiv.appendChild(div);
+    });
+  })
+  .catch(error => console.error('Error loading elements:', error));
 
-    // Function to parse and add elements from JSON file
-    function parseJSON() {
-      const fileInput = document.getElementById('fileInput');
-      const file = fileInput.files[0];
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        const jsonContent = event.target.result;
-        const elementsData = JSON.parse(jsonContent)['elements'];
-        for (const key in elementsData) {
-          const element = elementsData[key];
-          const elementString = element[0] + ' + ' + element[1] + ' = ' + element[2];
-          const elementsList = document.getElementById('elements');
-          const listItem = document.createElement('li');
-          listItem.textContent = elementString;
-          listItem.onclick = function() {
-            showElementInfo(elementString);
-          };
-          elementsList.appendChild(listItem);
-        }
-        saveElements();
-      };
-      reader.readAsText(file);
-    }
+function showCombinations(element) {
+  const combinationsDiv = document.getElementById('combinations');
+  combinationsDiv.innerHTML = `<h2>${element.name} Combinations</h2>`;
+  if (element.combinations && element.combinations.length > 0) {
+    element.combinations.forEach((combination, index) => {
+      combinationsDiv.innerHTML += `<p><strong>Step ${index + 1}:</strong> ${combination}</p>`;
+    });
+  } else {
+    combinationsDiv.innerHTML += '<p>No combinations found for this element.</p>';
+  }
+}
 
-    // Function to save elements to local storage
-    function saveElements() {
-      const elementsList = document.getElementById('elements');
-      const elements = [];
-      elementsList.querySelectorAll('li').forEach(item => elements.push(item.textContent));
-      localStorage.setItem('elements', JSON.stringify(elements));
+document.getElementById('searchInput').addEventListener('input', function(event) {
+  const searchTerm = event.target.value.toLowerCase();
+  const elementsDiv = document.getElementById('elements');
+  const elements = elementsDiv.getElementsByClassName('element');
+  for (const element of elements) {
+    const elementName = element.textContent.toLowerCase();
+    if (elementName.includes(searchTerm)) {
+      element.style.display = 'block';
+    } else {
+      element.style.display = 'none';
     }
-
-    // Function to load elements from local storage
-    function loadElements() {
-      const elements = JSON.parse(localStorage.getItem('elements'));
-      const elementsList = document.getElementById('elements');
-      elements.forEach(element => {
-        const listItem = document.createElement('li');
-        listItem.textContent = element;
-        listItem.onclick = function() {
-          showElementInfo(element);
-        };
-        elementsList.appendChild(listItem);
-      });
-    }
-
-    // Function to filter elements based on search input
-    function filterElements() {
-      const searchInput = document.getElementById('searchInput').value.toLowerCase();
-      const elementsList = document.getElementById('elements');
-      elementsList.querySelectorAll('li').forEach(item => {
-        const text = item.textContent.toLowerCase();
-        if (text.includes(searchInput)) {
-          item.style.display = 'block';
-        } else {
-          item.style.display = 'none';
-        }
-      });
-    }
-
-    // Function to show element information
-    function showElementInfo(element) {
-      const elementInfo = document.getElementById('elementInfo');
-      const elementCreation = document.getElementById('elementCreation');
-      const combinations = getCombinations(element);
-      let combinationText = '';
-      combinations.forEach((combination, index) => {
-        combinationText += `${index + 1}. ${combination}\n`;
-      });
-      elementCreation.textContent = combinationText;
-      elementInfo.style.display = 'block';
-    }
-
-    // Function to get combinations required for creating the selected element
-    function getCombinations(element) {
-      const combinations = [];
-      // Add your logic to generate combinations based on the provided
-    // element
-      // For demonstration purposes, let's assume some combinations
-      switch (element) {
-        case 'Swamp':
-          combinations.push("Earth + Water = Plant");
-          combinations.push("Plant + Plant = Tree");
-          combinations.push("Water + Fire = Stone");
-          combinations.push("Stone + Water = Mud");
-          combinations.push("Mud + Tree = Swamp (final step)");
-          break;
-        // Add cases for other elements if needed
-      }
-      return combinations;
-    }
-
-    // Load elements when the page is loaded
-    window.onload = loadElements;
+  }
+});
   </script>
 </body>
 </html>
