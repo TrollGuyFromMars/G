@@ -8,7 +8,12 @@ h1, h2 {
   text-align: center;
 }
 
-#elementList, #form, #jsonUpload {
+#search {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+#elementList, #form, #jsonUpload, #elementInfo {
   margin-bottom: 20px;
 }
 
@@ -27,4 +32,14 @@ ul {
 
 li {
   margin-bottom: 5px;
+  position: relative;
+}
+
+button {
+  position: absolute;
+  right: 0;
+}
+
+#elementInfo {
+  text-align: center;
 }
