@@ -4,10 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Alchemy Elements</title>
-  <link rel="stylesheet" href="https://github.com/TrollGuyFromMars/G/blob/main/styles.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <h1>Alchemy Elements</h1>
+  <div id="search">
+    <input type="text" id="searchInput" oninput="filterElements()" placeholder="Search elements...">
+  </div>
   <div id="elementList">
     <h2>Element List</h2>
     <ul id="elements"></ul>
@@ -23,6 +26,10 @@
     <input type="file" id="fileInput" accept=".json">
     <button onclick="parseJSON()">Upload</button>
   </div>
+  <div id="elementInfo" style="display: none;">
+    <h2>Element Info</h2>
+    <p id="elementCreation"></p>
+  </div>
   <script>
     // Function to add element to the list
     function addElement() {
@@ -30,6 +37,16 @@
       const elementsList = document.getElementById('elements');
       const listItem = document.createElement('li');
       listItem.textContent = elementInput;
+      const deleteButton = document.createElement('button');
+      deleteButton.textContent = 'Delete';
+      deleteButton.onclick = function() {
+        listItem.remove();
+        saveElements();
+      };
+      listItem.appendChild(deleteButton);
+      listItem.onclick = function() {
+        showElementInfo(elementInput);
+      };
       elementsList.appendChild(listItem);
       saveElements();
     }
@@ -48,6 +65,16 @@
           const elementsList = document.getElementById('elements');
           const listItem = document.createElement('li');
           listItem.textContent = elementString;
+          const deleteButton = document.createElement('button');
+          deleteButton.textContent = 'Delete';
+          deleteButton.onclick = function() {
+            listItem.remove();
+            saveElements();
+          };
+          listItem.appendChild(deleteButton);
+          listItem.onclick = function() {
+            showElementInfo(elementString);
+          };
           elementsList.appendChild(listItem);
         }
         saveElements();
@@ -70,8 +97,40 @@
       elements.forEach(element => {
         const listItem = document.createElement('li');
         listItem.textContent = element;
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.onclick = function() {
+          listItem.remove();
+          saveElements();
+        };
+        listItem.appendChild(deleteButton);
+        listItem.onclick = function() {
+          showElementInfo(element);
+        };
         elementsList.appendChild(listItem);
       });
+    }
+
+    // Function to filter elements based on search input
+    function filterElements() {
+      const searchInput = document.getElementById('searchInput').value.toLowerCase();
+      const elementsList = document.getElementById('elements');
+      elementsList.querySelectorAll('li').forEach(item => {
+        const text = item.textContent.toLowerCase();
+        if (text.includes(searchInput)) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+
+    // Function to show element information
+    function showElementInfo(element) {
+      const elementInfo = document.getElementById('elementInfo');
+      const elementCreation = document.getElementById('elementCreation');
+      elementCreation.textContent = `To create ${element}, you need...`; // You can add the logic to display creation here
+      elementInfo.style.display = 'block';
     }
 
     // Load elements when the page is loaded
